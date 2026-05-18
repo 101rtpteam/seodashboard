@@ -9,3 +9,4 @@ google-auth-oauthlib
 oauth2client
 httplib2
 python-dateutil
+pytrends

@@ -1274,31 +1274,43 @@ def trends_analyze():
         else:
             gsc_series = []
 
-        # ── Step 3: Google Trends ─────────────────────────────────────────────
-        token_file = os.path.join('/app/credentials', 'authorized_trends_token.json')
-        try:
-            trends_creds = load_trends_creds(token_file, trends_creds_path)
-        except Exception as e:
-            return jsonify({"error": f"Trends auth failed: {str(e)}"}), 500
+        # ── Step 3: Google Trends via pytrends ───────────────────────────────
+        from pytrends.request import TrendReq
+        import time as _time
 
-        start_dt = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').replace(
-            tzinfo=datetime.timezone.utc)
         cutoff = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=3)
-        end_dt = min(
-            datetime.datetime.strptime(end_date_str, '%Y-%m-%d').replace(
-                tzinfo=datetime.timezone.utc),
-            cutoff
-        )
+        end_dt_str = min(
+            datetime.datetime.strptime(end_date_str, '%Y-%m-%d'),
+            cutoff.replace(tzinfo=None)
+        ).strftime('%Y-%m-%d')
+        timeframe = f"{start_date_str} {end_dt_str}"
+
+        pytrends = TrendReq(hl='en-US', tz=0, timeout=(10, 25))
 
         trends_by_keyword = {}
         errors = []
-        for q in top_queries:
+        # pytrends принимает максимум 5 ключевых слов за раз
+        batch_size = 5
+        for i in range(0, len(top_queries), batch_size):
+            batch = top_queries[i:i+batch_size]
             try:
-                pts = fetch_trends_for_query(q, trends_creds, token_file,
-                                             start_dt, end_dt, geo_code, time_res)
-                trends_by_keyword[q] = pts
+                pytrends.build_payload(batch, timeframe=timeframe, geo=geo_code)
+                df_trends = pytrends.interest_over_time()
+                if df_trends.empty:
+                    errors.append(f"Batch {batch}: no data returned")
+                    continue
+                for q in batch:
+                    if q in df_trends.columns:
+                        pts = [
+                            {"date": str(idx.date()), "value": float(val)}
+                            for idx, val in df_trends[q].items()
+                            if not df_trends.get("isPartial", pd.Series([False]*len(df_trends))).iloc[df_trends.index.get_loc(idx)]
+                        ]
+                        if pts:
+                            trends_by_keyword[q] = pts
+                _time.sleep(0.5)  # avoid rate limiting
             except Exception as e:
-                errors.append(f"{q}: {str(e)}")
+                errors.append(f"Batch {batch}: {str(e)}")
 
         if not trends_by_keyword:
             return jsonify({
@@ -1414,7 +1426,7 @@ Data (Date | GSC Clicks | Google Trends scaled interest):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
             ],
-            model="gpt-4o",
+            model="anthropic/claude-3.5-haiku",
         )
 
         return jsonify({"insights": chat_completion.choices[0].message.content})
