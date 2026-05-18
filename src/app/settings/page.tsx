@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { BACKEND_URL } from '@/lib/backend';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey, faFile, faCheckCircle, faExclamationTriangle, faSpinner, faEye, faEyeSlash, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -42,8 +43,8 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const [settingsResponse, sitesResponse] = await Promise.all([
-        fetch('http://localhost:5001/api/settings'),
-        fetch('http://localhost:5001/api/sites')
+        fetch(`${BACKEND_URL}/api/settings`),
+        fetch(`${BACKEND_URL}/api/sites`)
       ]);
       
       if (settingsResponse.ok) {
@@ -80,7 +81,7 @@ export default function SettingsPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const response = await fetch('http://localhost:5001/api/settings', {
+      const response = await fetch(`${BACKEND_URL}/api/settings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +127,7 @@ export default function SettingsPage() {
     setAuthorizing(true);
     setMessage(null);
     try {
-      const response = await fetch('http://localhost:5001/api/authorize', {
+      const response = await fetch(`${BACKEND_URL}/api/authorize`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +165,7 @@ export default function SettingsPage() {
     setClearing(true);
     setMessage(null);
     try {
-      const response = await fetch('http://localhost:5001/api/settings/clear', {
+      const response = await fetch(`${BACKEND_URL}/api/settings/clear`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

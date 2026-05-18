@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { BACKEND_URL } from '@/lib/backend';
 import { useData } from '@/contexts/DataContext';
 import ReactMarkdown from 'react-markdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -93,7 +94,7 @@ export default function TrendsAnalysisPage() {
   const chartInstance = useRef<any>(null);
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/algo-updates')
+    fetch(`${BACKEND_URL}/api/algo-updates`)
       .then(r => r.json())
       .then(d => setAlgorithmUpdates(d.algo_updates || []))
       .catch(() => {});
@@ -154,7 +155,7 @@ export default function TrendsAnalysisPage() {
     if (chartInstance.current) { chartInstance.current.destroy(); chartInstance.current = null; }
 
     try {
-      const resp = await fetch('http://localhost:5001/api/trends/analyze', {
+      const resp = await fetch(`${BACKEND_URL}/api/trends/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -352,7 +353,7 @@ export default function TrendsAnalysisPage() {
     });
 
     try {
-      const resp = await fetch('http://localhost:5001/api/trends/insights', {
+      const resp = await fetch(`${BACKEND_URL}/api/trends/insights`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

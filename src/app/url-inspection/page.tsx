@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { BACKEND_URL } from '@/lib/backend';
 import { useData } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -89,7 +90,7 @@ export default function UrlInspectionPage() {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:5001/api/url-inspect', {
+      const response = await fetch(`${BACKEND_URL}/api/url-inspect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

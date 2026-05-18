@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { BACKEND_URL } from '@/lib/backend';
 import { useData } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -60,7 +61,7 @@ export default function SitemapPage() {
     setSuccess(null);
 
     try {
-      const url = `http://localhost:5001/api/sitemaps?siteUrl=${encodeURIComponent(selectedSite)}`;
+      const url = `${BACKEND_URL}/api/sitemaps?siteUrl=${encodeURIComponent(selectedSite)}`;
       console.log('[FRONTEND] Loading sitemaps for:', selectedSite);
       console.log('[FRONTEND] Request URL:', url);
       
@@ -114,7 +115,7 @@ export default function SitemapPage() {
     setSuccess(null);
 
     try {
-      const response = await fetch('http://localhost:5001/api/sitemaps/submit', {
+      const response = await fetch(`${BACKEND_URL}/api/sitemaps/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +161,7 @@ export default function SitemapPage() {
     setSuccess(null);
 
     try {
-      const response = await fetch('http://localhost:5001/api/sitemaps/delete', {
+      const response = await fetch(`${BACKEND_URL}/api/sitemaps/delete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -211,7 +212,7 @@ export default function SitemapPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5001/api/sitemaps/get?siteUrl=${encodeURIComponent(selectedSite)}&feedpath=${encodeURIComponent(sitemap.path)}`
+        `${BACKEND_URL}/api/sitemaps/get?siteUrl=${encodeURIComponent(selectedSite)}&feedpath=${encodeURIComponent(sitemap.path)}`
       );
 
       const data = await response.json();
