@@ -17,7 +17,7 @@ from oauth2client import client, file, tools
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 import json
-from openai import OpenAI
+from openai import OpenAI  # OpenRouter использует OpenAI-совместимый SDK
 import requests as http_requests
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request as GoogleRequest
@@ -26,7 +26,11 @@ app = Flask(__name__)
 # Enable CORS for Next.js frontend with explicit configuration
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+        "origins": [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://0.0.0.0:3000"
+        ],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
@@ -43,8 +47,8 @@ openai_client = None
 # Default settings
 DEFAULT_SETTINGS = {
     "openaiApiKey": "",
-    "credentialsPath": "/Users/kburchardt/Desktop/SEO_scripts-main/scripts/Api-Keys/client_secret.json",
-    "trendsCredentialsPath": "",
+    "credentialsPath": "/app/credentials/client_secret.json",
+    "trendsCredentialsPath": "/app/credentials/trends_client_secret.json",
     "isAuthorized": False,
     "overviewSites": []
 }
@@ -176,21 +180,24 @@ def save_config(config):
         return False
 
 def initialize_openai_client():
-    """Initialize OpenAI client from config"""
+    """Initialize OpenRouter client (OpenAI-compatible API)"""
     global openai_client
     config = load_config()
     api_key = config.get('openaiApiKey', '')
     if api_key:
         try:
-            openai_client = OpenAI(api_key=api_key)
-            print("OpenAI client initialized")
+            openai_client = OpenAI(
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1"
+            )
+            print("OpenRouter client initialized")
         except Exception as e:
-            print(f"Error initializing OpenAI client: {e}")
+            print(f"Error initializing OpenRouter client: {e}")
             openai_client = None
     else:
         openai_client = None
 
-def authorize_creds(creds_path, authorized_creds_path='authorizedcreds.dat'):
+def authorize_creds(creds_path, authorized_creds_path='/app/credentials/authorizedcreds.dat'):
     """Authorize and return the Webmasters API service"""
     try:
         SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly']
@@ -623,7 +630,7 @@ def get_gpt_insights(content, analysis_type="general"):
                     "content": content
                 }
             ],
-            model="gpt-4o"
+            model="anthropic/claude-3.5-haiku"
         )
         
         response_message = chat_completion.choices[0].message.content
@@ -1241,7 +1248,7 @@ def trends_analyze():
             gsc_series = []
 
         # ── Step 3: Google Trends ─────────────────────────────────────────────
-        token_file = os.path.join(os.path.dirname(__file__), 'authorized_trends_token.json')
+        token_file = os.path.join('/app/credentials', 'authorized_trends_token.json')
         try:
             trends_creds = load_trends_creds(token_file, trends_creds_path)
         except Exception as e:

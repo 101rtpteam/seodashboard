@@ -66,7 +66,7 @@ export default function AuthBanner() {
                 Please go to Settings and follow these steps:
               </p>
               <ol className="text-sm text-yellow-800 list-decimal list-inside space-y-1 mb-3">
-                <li>Enter your OpenAI API key</li>
+                <li>Enter your OpenRouter API key</li>
                 <li>Enter the path to your Google Search Console credentials file (client_secret.json)</li>
                 <li>Click "Save Settings"</li>
                 <li>Click "Authorize Credentials" to authenticate with Google</li>

@@ -237,11 +237,11 @@ export default function SettingsPage() {
           </div>
         ) : (
           <>
-            {/* OpenAI API Key */}
+            {/* OpenRouter API Key */}
             <div className="space-y-2">
               <label htmlFor="openai-key" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <FontAwesomeIcon icon={faKey} className="text-gray-500" />
-                <span>OpenAI API Key</span>
+                <span>OpenRouter API Key</span>
               </label>
               <div className="relative">
                 <input
@@ -249,7 +249,7 @@ export default function SettingsPage() {
                   type={showApiKey ? "text" : "password"}
                   value={settings.openaiApiKey}
                   onChange={(e) => setSettings({ ...settings, openaiApiKey: e.target.value })}
-                  placeholder="sk-proj-..."
+                  placeholder="sk-or-v1-..."
                   className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <button
@@ -262,9 +262,9 @@ export default function SettingsPage() {
                 </button>
               </div>
               <p className="text-xs text-gray-500">
-                Your OpenAI API key is used to generate insights. Get your key from{' '}
-                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  OpenAI Platform
+                OpenRouter API key используется для AI-инсайтов. Получи ключ на{' '}
+                <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  openrouter.ai/keys
                 </a>
               </p>
             </div>
@@ -457,7 +457,7 @@ export default function SettingsPage() {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <h2 className="text-lg font-semibold text-blue-900 mb-3">Setup Instructions</h2>
         <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
-          <li>Get your OpenAI API key from the OpenAI Platform and paste it above</li>
+          <li>Get your OpenRouter API key from openrouter.ai/keys and paste it above</li>
           <li>Download your Google Search Console credentials (client_secret.json) from Google Cloud Console</li>
           <li>Enter the full path to your client_secret.json file</li>
           <li>Click "Save Settings" to save your configuration</li>

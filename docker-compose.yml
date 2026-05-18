@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: seo-dashboard-backend
+    ports:
+      - "5001:5001"
+    volumes:
+      # Здесь хранятся client_secret.json, authorizedcreds.dat, конфиг
+      - ./credentials:/app/credentials
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: seo-dashboard-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped

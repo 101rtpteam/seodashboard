@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Системные зависимости
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python зависимости
+COPY backend_requirements.txt .
+RUN pip install --no-cache-dir -r backend_requirements.txt
+
+# Копируем бэкенд
+COPY backend_api.py .
+COPY algo_updates.json .
+
+# Папка для credentials (монтируется как volume)
+RUN mkdir -p /app/credentials
+
+EXPOSE 5001
+
+CMD ["python3", "backend_api.py"]

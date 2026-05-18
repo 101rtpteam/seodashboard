@@ -84,3 +84,9 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Credentials — НИКОГДА не коммитить
+credentials/
+dashboard_config.json
+authorizedcreds.dat
+authorized_trends_token.json
