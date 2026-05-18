@@ -38,10 +38,6 @@ export default function LoginForm() {
         background: 'white', borderRadius: 16, padding: '48px 40px',
         width: 360, boxShadow: '0 4px 32px rgba(157,10,255,0.10)',
       }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#9D0AFF', marginBottom: 4 }}>101RTP</div>
-          <div style={{ fontSize: 14, color: '#6652FF', fontWeight: 500 }}>SEO Dashboard</div>
-        </div>
         <form onSubmit={handleSubmit}>
           <input
             type="password" placeholder="Пароль" value={password}
