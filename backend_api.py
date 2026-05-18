@@ -24,17 +24,41 @@ from google.auth.transport.requests import Request as GoogleRequest
 
 app = Flask(__name__)
 # Enable CORS for Next.js frontend with explicit configuration
+# Railway frontend URL добавляется через ALLOWED_ORIGINS env var
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://0.0.0.0:3000",
+]
+extra_origins = os.environ.get("ALLOWED_ORIGINS", "")
+if extra_origins:
+    allowed_origins += [o.strip() for o in extra_origins.split(",") if o.strip()]
+
 CORS(app, resources={
     r"/api/*": {
-        "origins": [
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://0.0.0.0:3000"
-        ],
+        "origins": allowed_origins,
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
 })
+
+# ── Railway / Docker: распаковываем credentials из env vars ──────────────────
+def _write_from_env(env_var: str, dest_path: str):
+    """Если env var задан — декодируем base64 и пишем файл."""
+    import base64
+    val = os.environ.get(env_var, "")
+    if val:
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        with open(dest_path, "wb") as f:
+            f.write(base64.b64decode(val))
+        print(f"[env] {env_var} → {dest_path}")
+
+_write_from_env("GSC_CLIENT_SECRET_B64",   "/app/credentials/client_secret.json")
+_write_from_env("GSC_AUTHORIZED_CREDS_B64", "/app/credentials/authorizedcreds.dat")
+
+# OpenRouter key из env var (Railway) — переопределяет настройки из UI
+_OPENROUTER_KEY_FROM_ENV = os.environ.get("OPENROUTER_API_KEY", "")
+
 
 # Config file path
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'dashboard_config.json')
@@ -183,7 +207,8 @@ def initialize_openai_client():
     """Initialize OpenRouter client (OpenAI-compatible API)"""
     global openai_client
     config = load_config()
-    api_key = config.get('openaiApiKey', '')
+    # Приоритет: env var (Railway) → настройки из UI
+    api_key = _OPENROUTER_KEY_FROM_ENV or config.get('openaiApiKey', '')
     if api_key:
         try:
             openai_client = OpenAI(
