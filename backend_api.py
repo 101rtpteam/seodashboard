@@ -79,31 +79,33 @@ DEFAULT_SETTINGS = {
 
 # ─── Google Trends helpers ────────────────────────────────────────────────────
 
-TRENDS_SCOPES = ["https://www.googleapis.com/auth/searchtrends"]
+TRENDS_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 TRENDS_BASE_URLS = [
     "https://searchtrends.googleapis.com",
     "https://trends.googleapis.com",
 ]
 
+# Загружаем Trends credentials из env vars при старте
+_write_from_env("TRENDS_CLIENT_SECRET_B64",    "/app/credentials/trends_client_secret.json")
+_write_from_env("TRENDS_AUTHORIZED_TOKEN_B64", "/app/credentials/authorized_trends_token.json")
+
 
 def load_trends_creds(token_file: str, client_secrets: str) -> Credentials:
     creds = None
     if os.path.exists(token_file):
-        creds = Credentials.from_authorized_user_file(token_file, TRENDS_SCOPES)
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(GoogleRequest())
-        with open(token_file, "w") as f:
-            f.write(creds.to_json())
-        return creds
-    if not creds or not creds.valid:
-        from google_auth_oauthlib.flow import InstalledAppFlow
-        flow = InstalledAppFlow.from_client_secrets_file(client_secrets, TRENDS_SCOPES)
         try:
-            creds = flow.run_local_server(port=0)
+            creds = Credentials.from_authorized_user_file(token_file)
         except Exception:
-            creds = flow.run_console()
-        with open(token_file, "w") as f:
-            f.write(creds.to_json())
+            creds = None
+    if creds and creds.expired and creds.refresh_token:
+        try:
+            creds.refresh(GoogleRequest())
+            with open(token_file, "w") as f:
+                f.write(creds.to_json())
+        except Exception:
+            pass
+    if not creds or not creds.token:
+        raise RuntimeError("Trends credentials not available. Set TRENDS_CLIENT_SECRET_B64 and TRENDS_AUTHORIZED_TOKEN_B64 env vars.")
     return creds
 
 
