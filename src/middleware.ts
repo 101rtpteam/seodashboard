@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const LOGIN_PATH = '/_auth/login';
+const LOGIN_PATH = '/auth/login';
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

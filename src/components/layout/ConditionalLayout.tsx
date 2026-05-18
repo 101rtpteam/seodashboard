@@ -6,7 +6,7 @@ import AuthBanner from './AuthBanner';
 
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname?.startsWith('/_auth');
+  const isAuthPage = pathname?.startsWith('/auth');
 
   if (isAuthPage) {
     return <>{children}</>;
