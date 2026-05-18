@@ -1469,9 +1469,9 @@ if __name__ == '__main__':
     init_gsc()
     
     try:
-        # Use use_reloader=False to prevent multiprocessing conflicts
-        # This is safer when using pandas and other libraries that use multiprocessing
-        app.run(debug=True, port=5001, use_reloader=False, threaded=True)
+        # Railway передаёт порт через env var PORT; локально используем 5001
+        port = int(os.environ.get("PORT", 5001))
+        app.run(debug=False, host="0.0.0.0", port=port, use_reloader=False, threaded=True)
     except KeyboardInterrupt:
         print("\nShutting down backend...")
     except Exception as e:
