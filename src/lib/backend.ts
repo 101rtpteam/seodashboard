@@ -1,1 +1,3 @@
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+// Все запросы идут через Next.js proxy → бэкенд
+// Работает и локально (localhost:5001) и на Railway (через BACKEND_URL серверную переменную)
+export const BACKEND_URL = '/api/proxy';
